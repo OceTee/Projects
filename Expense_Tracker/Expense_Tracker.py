@@ -5,13 +5,14 @@ from Expense_Class import Expense
 def main():
     print(f"Running Expense Tracker!")
     expense_file_path = "./Expense_Tracker/Expense.csv"
+    Budget = 3000
     
     # Get user input for expense
     expense = get_user_expense()
     # Write their expense to file
     write_expense_to_file(expense, expense_file_path)
     # Read and summarize expenses
-    read_and_summarize_expenses(expense_file_path)
+    read_and_summarize_expenses(expense_file_path, Budget)
 
 # Function for the user input
 def get_user_expense():
@@ -56,7 +57,7 @@ def get_user_expense():
 # Saving user input to file
     
 def write_expense_to_file(expense: Expense, expense_file_path):
-    print(f"Saving User expense: {expense} to {expense_file_path}")
+    print(f"Saving User expense: {expense} to Expenses")
 
     # Implementing file writing logic
     
@@ -65,23 +66,47 @@ def write_expense_to_file(expense: Expense, expense_file_path):
 
 
 
-def read_and_summarize_expenses(expense_file_path):
+def read_and_summarize_expenses(expense_file_path, Budget):
     print(f"Summarizing User Expenses")
 
     # Expense list to store the results
-    expenses = []
+    expenses:list[Expense] = []
     # Implementing file reading logic
 
     with open(expense_file_path, "r") as f:
         lines = f.readlines()
         for line in lines:
-            # for removing the white spaces in the string
-            stripped_line = line.strip()
-            line_elements = line.split(",")
-            expense_name = line_elements[0]
-            expense_category = line_elements[1]
-            expense_amount = float(line_elements[2])
-            print(expense_name, expense_amount, expense_category)
+           
+            expense_name,  expense_category, expense_amount = line.strip().split(",")
+            line_expense = Expense(
+                name=expense_name, category=expense_category, amount=float(expense_amount)
+            )
+            # print(line_expense)
+            expenses.append(line_expense)
+        # print(expenses)
+
+    amount_by_category = {}
+    for expense in expenses:
+        key = expense.category
+        if key in amount_by_category:
+            amount_by_category[key] += expense.amount
+        else:
+            amount_by_category[key] = expense.amount
+        
+        # Summing up the total
+
+    print("Expenses By Category:")
+    for key, amount in amount_by_category.items():
+        print(f"{key}: ${amount:.2f}")
+
+    total_spent = sum([ex.amount for ex in expenses])
+    print(f"You've Spent ${total_spent} this month")
+
+    remaining_budget = Budget - total_spent 
+
+    print(f"Your Remaining Budget is ${remaining_budget}")
+
+    # print (amount_by_category)
 
 
 # function will only be run if called
